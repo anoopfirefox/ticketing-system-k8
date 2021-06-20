@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+     app: ticketing-ui
+  name: ticketing-ui 
+  namespace: ticketing
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+        maxUnavailable: 25%
+        maxSurge: 2
+  selector:
+    matchLabels:
+        app: ticketing-ui
+  template:
+    metadata:
+      labels:
+         app: ticketing-ui
+    spec:
+      containers:
+        - image: anoophegde1995/peppermint_ticketing:v1
+          name: ticketing-ui
+          ports:
+          - containerPort: 5000
+            name: ticketing-ui
+       
+          env:
+            - name: DB_HOST
+              value: "postgres-service"
+
+            - name: DATABASE_URL
+              value: "postgresql://peppermint:1234@postgres-service:5432/peppermint?schema=public"
+
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                   name: ui-secret
+                   key: JWT_SECRET
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                   name: ui-secret
+                   key: DB_USERNAME
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                   name: ui-secret
+                   key: DB_PASSWORD
+
+
+
+   
+   
+            
